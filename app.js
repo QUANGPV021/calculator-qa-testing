@@ -288,6 +288,11 @@ function updateDisplay() {
 }
 
 function inputDigit(digit) {
+  if (state.justCalculated) {
+    state.currentInput = digit;
+    state.justCalculated = false;
+    return;
+  }
   if (state.waitingForSecondOperand) {
     state.currentInput = digit;
     state.waitingForSecondOperand = false;
@@ -396,6 +401,7 @@ function calculate() {
   state.lastOperand = secondVal;
   state.operation = null;
   state.waitingForSecondOperand = false;
+  state.justCalculated = true;
 
   addHistory(expression, rawResult);
 }
