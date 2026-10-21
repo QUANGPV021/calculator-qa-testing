@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartCalc Pro - Ứng Dụng Máy Tính & Dự Án Kiểm Thử Phần Mềm</title>
+  <meta name="description" content="Ứng dụng máy tính bỏ túi đa năng phục vụ học tập, thực hành kiểm thử phần mềm (Software Testing & QA Project)." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-background">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+  </div>
+
+  <header class="app-header">
+    <div class="header-brand">
+      <div class="brand-logo">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="2" width="16" height="20" rx="3" />
+          <line x1="8" y1="6" x2="16" y2="6" />
+          <line x1="16" y1="14" x2="16" y2="18" />
+          <path d="M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M8 18h.01M12 18h.01" />
+        </svg>
+      </div>
+      <div>
+        <h1 class="brand-title">SmartCalc <span class="badge-version">v1.0-QA</span></h1>
+        <p class="brand-subtitle">Dự án Kiểm thử Phần mềm & Thực hành QA/QC</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button id="btnDocsModal" class="btn-action" title="Xem tài liệu kiểm thử">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        <span>Tài Liệu SRS & Test</span>
+      </button>
+
+      <button id="btnToggleQAMode" class="btn-action btn-qa-badge" title="Mở Bảng Giảng Viên / QA Inspector">
+        <span class="status-dot"></span>
+        <span>QA Inspector (Đáp án)</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <!-- Calculator Card -->
+    <div class="calculator-card">
+      <!-- Screen / Display Section -->
+      <div class="calc-screen-wrapper">
+        <div class="screen-meta">
+          <div class="memory-indicators">
+            <span id="memIndicator" class="mem-badge hidden">M</span>
+            <span id="modeIndicator" class="mode-badge">DEG</span>
+          </div>
+          <div id="historyDisplay" class="screen-expression" title="Lịch sử phép tính"></div>
+        </div>
+        <div class="screen-main">
+          <div id="currentDisplay" class="screen-value">0</div>
+        </div>
+      </div>
+
+      <!-- Keypad Section -->
+      <div class="calc-keypad">
+        <!-- Memory Row -->
+        <div class="key-row memory-row">
+          <button id="btnMC" class="key-btn key-mem" data-action="mc" title="Memory Clear">MC</button>
+          <button id="btnMR" class="key-btn key-mem" data-action="mr" title="Memory Recall">MR</button>
+          <button id="btnMPlus" class="key-btn key-mem" data-action="m-plus" title="Memory Add">M+</button>
+          <button id="btnMMinus" class="key-btn key-mem" data-action="m-minus" title="Memory Subtract">M-</button>
+          <button id="btnMS" class="key-btn key-mem" data-action="ms" title="Memory Store">MS</button>
+        </div>
+
+        <!-- Main Keys Grid -->
+        <div class="keypad-grid">
+          <!-- Row 1 -->
+          <button id="btnAC" class="key-btn key-special" data-action="clear-all">AC</button>
+          <button id="btnC" class="key-btn key-special" data-action="clear-entry">C</button>
+          <button id="btnBackspace" class="key-btn key-special" data-action="backspace" title="Xóa ký tự cuối">⌫</button>
+          <button id="btnDivide" class="key-btn key-op" data-action="operator" data-val="÷">÷</button>
+
+          <!-- Row 2 -->
+          <button id="btnSqrt" class="key-btn key-func" data-action="sqrt" title="Căn bậc hai">√</button>
+          <button id="btnSquare" class="key-btn key-func" data-action="square" title="Bình phương">x²</button>
+          <button id="btnPercent" class="key-btn key-func" data-action="percent" title="Phần trăm">%</button>
+          <button id="btnMultiply" class="key-btn key-op" data-action="operator" data-val="×">×</button>
+
+          <!-- Row 3 -->
+          <button id="btn7" class="key-btn key-num" data-action="number" data-val="7">7</button>
+          <button id="btn8" class="key-btn key-num" data-action="number" data-val="8">8</button>
+          <button id="btn9" class="key-btn key-num" data-action="number" data-val="9">9</button>
+          <button id="btnSubtract" class="key-btn key-op" data-action="operator" data-val="-">−</button>
+
+          <!-- Row 4 -->
+          <button id="btn4" class="key-btn key-num" data-action="number" data-val="4">4</button>
+          <button id="btn5" class="key-btn key-num" data-action="number" data-val="5">5</button>
+          <button id="btn6" class="key-btn key-num" data-action="number" data-val="6">6</button>
+          <button id="btnAdd" class="key-btn key-op" data-action="operator" data-val="+">+</button>
+
+          <!-- Row 5 -->
+          <button id="btn1" class="key-btn key-num" data-action="number" data-val="1">1</button>
+          <button id="btn2" class="key-btn key-num" data-action="number" data-val="2">2</button>
+          <button id="btn3" class="key-btn key-num" data-action="number" data-val="3">3</button>
+          <button id="btnEquals" class="key-btn key-equals" data-action="calculate" rowspan="2">=</button>
+
+          <!-- Row 6 -->
+          <button id="btnToggleSign" class="key-btn key-func" data-action="toggle-sign" title="Đổi dấu">±</button>
+          <button id="btn0" class="key-btn key-num" data-action="number" data-val="0">0</button>
+          <button id="btnDecimal" class="key-btn key-num" data-action="decimal" data-val=".">.</button>
+        </div>
+      </div>
+
+      <div class="calc-footer-tips">
+        <span>💡 Phím tắt: 0-9, +, -, *, /, Enter (=), Esc (AC), Backspace (⌫)</span>
+      </div>
+    </div>
+
+    <!-- Right Side Panel: Calculation History -->
+    <aside class="sidebar-card">
+      <div class="sidebar-header">
+        <div class="sidebar-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span>Nhật Ký Tính Toán (History)</span>
+        </div>
+        <button id="btnClearHistory" class="btn-text-danger" title="Xóa lịch sử">Xóa lịch sử</button>
+      </div>
+
+      <div id="historyList" class="history-list">
+        <div class="empty-state">
+          <p>Chưa có phép tính nào được thực hiện.</p>
+          <small>Các kết quả tính sẽ hiển thị tại đây.</small>
+        </div>
+      </div>
+
+      <div class="sidebar-stats">
+        <div class="stat-item">
+          <span class="stat-label">Tổng phép tính:</span>
+          <span id="statCount" class="stat-val">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Bộ nhớ tạm (Memory):</span>
+          <span id="statMemory" class="stat-val">0</span>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- QA Inspector / Bugs Catalog Modal/Drawer -->
+  <div id="qaDrawer" class="qa-drawer hidden">
+    <div class="qa-drawer-content">
+      <div class="qa-drawer-header">
+        <div>
+          <h2>🕵️‍♂️ QA Inspector - Danh Sách 15 Lỗi Cài Cắm (Bugs Catalog)</h2>
+          <p>Dành cho Giảng viên / Nhóm trưởng QA để kiểm tra và đối chiếu kết quả kiểm thử.</p>
+        </div>
+        <button id="btnCloseQA" class="btn-close">&times;</button>
+      </div>
+
+      <div class="qa-filter-bar">
+        <span class="filter-label">Bộ lọc mức độ:</span>
+        <button class="filter-btn active" data-filter="all">Tất cả (15)</button>
+        <button class="filter-btn" data-filter="Critical">Critical</button>
+        <button class="filter-btn" data-filter="Major">Major</button>
+        <button class="filter-btn" data-filter="Medium">Medium</button>
+        <button class="filter-btn" data-filter="Minor">Minor</button>
+      </div>
+
+      <div class="qa-bugs-grid" id="bugsListContainer">
+        <!-- Rendered by app.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Documentation Modal -->
+  <div id="docsModal" class="docs-modal hidden">
+    <div class="docs-modal-dialog">
+      <div class="docs-modal-header">
+        <h2>📑 Tài Liệu Dự Án Kiểm Thử Máy Tính</h2>
+        <button id="btnCloseDocs" class="btn-close">&times;</button>
+      </div>
+      <div class="docs-modal-body">
+        <div class="docs-nav-tabs">
+          <button class="tab-btn active" data-tab="tab-srs">1. Đặc Tả Yêu Cầu (SRS)</button>
+          <button class="tab-btn" data-tab="tab-testplan">2. Kế Hoạch Test (Test Plan)</button>
+          <button class="tab-btn" data-tab="tab-template">3. Mẫu Bug Report</button>
+        </div>
+
+        <div class="docs-tab-content">
+          <div id="tab-srs" class="tab-pane active">
+            <h3>Đặc Tả Tính Năng Chuẩn Cần Kiểm Thử (Expected Requirements)</h3>
+            <ul>
+              <li><strong>REQ-01:</strong> Các phép toán cơ bản (+, -, ×, ÷) phải tính toán chính xác số học thông thường và số thực.</li>
+              <li><strong>REQ-02:</strong> Phải tuân thủ thứ tự ưu tiên toán học chuẩn (BODMAS / Nhân chia trước, cộng trừ sau).</li>
+              <li><strong>REQ-03:</strong> Chia cho 0 (Division by Zero) phải báo lỗi thân thiện <em>"Không thể chia cho 0"</em> và không cho tiếp tục tính toán sai.</li>
+              <li><strong>REQ-04:</strong> Dấu chấm thập phân chỉ được phép xuất hiện tối đa 1 lần trong mỗi toán hạng.</li>
+              <li><strong>REQ-05:</strong> Không được cho phép số có nhiều số 0 vô nghĩa ở đầu (ví dụ: không được nhập <code>0005</code>).</li>
+              <li><strong>REQ-06:</strong> Phép căn bậc hai (√) trên số âm phải hiển thị lỗi hợp lệ, không hiển thị <code>NaN</code>.</li>
+              <li><strong>REQ-07:</strong> Chức năng bộ nhớ: MC (xóa nhớ), MR (gọi nhớ), M+ (cộng vào nhớ), M- (trừ khỏi nhớ). Nút C chỉ xóa màn hình hiện tại, không xóa Memory.</li>
+              <li><strong>REQ-08:</strong> Khi nhấn liên tiếp toán tử (VD: bấm <code>+</code> rồi bấm <code>*</code>), toán tử sau cùng phải thay thế toán tử trước.</li>
+              <li><strong>REQ-09:</strong> Xóa lịch sử phải làm sạch hoàn toàn bộ nhớ lưu trữ, không bị phục hồi lại ở phép tính tiếp theo.</li>
+              <li><strong>REQ-10:</strong> Giới hạn hiển thị: Màn hình phải tự động co chữ hoặc chuyển dạng khoa học (e-notation) khi vượt quá 14 chữ số, không được tràn khung.</li>
+            </ul>
+          </div>
+
+          <div id="tab-testplan" class="tab-pane">
+            <h3>Kế Hoạch Kiểm Thử Mẫu (Test Plan Guidelines)</h3>
+            <p>Sinh viên / Tester cần triển khai các phương pháp sau:</p>
+            <ol>
+              <li><strong>Phân vùng tương đương (Equivalence Partitioning):</strong> Số dương, số âm, số 0, số thập phân lớn/nhỏ.</li>
+              <li><strong>Phân tích giá trị biên (Boundary Value Analysis):</strong> Giới hạn độ dài hiển thị (15, 16, 20 ký tự), chia cho 0.000001 và 0.</li>
+              <li><strong>Kiểm thử chuyển trạng thái (State Transition Testing):</strong> Chuỗi AC -> C -> M+ -> MR -> C -> MR.</li>
+              <li><strong>Đoán lỗi (Error Guessing):</strong> Bấm liên tục dấu chấm <code>...</code>, bấm phép tính không có toán hạng sau, bấm căn số âm.</li>
+            </ol>
+          </div>
+
+          <div id="tab-template" class="tab-pane">
+            <h3>Mẫu Báo Cáo Lỗi Chuẩn (Standard Bug Report Format)</h3>
+            <pre class="code-block"><code>**Bug ID**: BUG-001
+**Title**: [Module] Mô tả ngắn gọn lỗi xảy ra
+**Severity**: Critical / Major / Medium / Minor
+**Steps to Reproduce**:
+  1. Nhập số "0.1"
+  2. Nhấn nút "+"
+  3. Nhập số "0.2"
+  4. Nhấn nút "="
+**Expected Result**: Kết quả hiển thị "0.3"
+**Actual Result**: Kết quả hiển thị "0.30000000000000004"
+**Screenshot/Log**: [Ảnh chụp màn hình]
+**Tester Name**: Nguyễn Văn A</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

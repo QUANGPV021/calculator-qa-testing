@@ -1,0 +1,26 @@
+Test Case ID,Module,Test Description,Pre-conditions,Test Steps,Test Data,Expected Result,Status,Bug ID
+TC-01,Basic Math,Kiểm tra phép cộng hai số nguyên dương,Màn hình là 0,1. Nhập 15 -> 2. Bấm + -> 3. Nhập 25 -> 4. Bấm =,15 + 25,Màn hình hiển thị 40,PASS,
+TC-02,Basic Math,Kiểm tra cộng hai số thập phân 0.1 và 0.2,Màn hình là 0,1. Nhập 0.1 -> 2. Bấm + -> 3. Nhập 0.2 -> 4. Bấm =,0.1 + 0.2,Màn hình hiển thị chính xác 0.3,FAIL,BUG-01
+TC-03,Input Validation,Kiểm tra nhập nhiều dấu chấm trong cùng một số,Màn hình là 0,1. Nhập 5 -> 2. Bấm . -> 3. Nhập 2 -> 4. Bấm . -> 5. Nhập 3,5.2.3,Ứng dụng chỉ cho phép 1 dấu chấm (5.23),FAIL,BUG-02
+TC-04,Basic Math,Kiểm tra phép chia cho số 0,Màn hình là 0,1. Nhập 9 -> 2. Bấm ÷ -> 3. Nhập 0 -> 4. Bấm =,9 ÷ 0,Hiển thị thông báo lỗi Cannot divide by zero,FAIL,BUG-03
+TC-05,Operator Precedence,Kiểm tra biểu thức kết hợp nhân và cộng (BODMAS),Màn hình là 0,1. Nhập 2 -> 2. Bấm + -> 3. Nhập 3 -> 4. Bấm × -> 5. Nhập 4 -> 6. Bấm =,2 + 3 × 4,Kết quả phải là 14,FAIL,BUG-04
+TC-06,Advanced,Kiểm tra tính căn bậc hai của số dương,Màn hình là 0,1. Nhập 16 -> 2. Bấm √,√16,Màn hình hiển thị 4,PASS,
+TC-07,Advanced,Kiểm tra tính căn bậc hai của số âm,Màn hình là 0,1. Nhập 9 -> 2. Bấm ± -> 3. Bấm √,√(-9),Báo lỗi hợp lệ Invalid Input không crash,FAIL,BUG-05
+TC-08,Input Validation,Kiểm tra nhập nhiều số 0 vô nghĩa ở đầu,Màn hình là 0,1. Bấm 0 3 lần -> 2. Bấm 8,0008,Màn hình chuẩn hóa thành 8,FAIL,BUG-06
+TC-09,Boundary UI,Kiểm tra nhập chuỗi số vượt quá 16 chữ số,Màn hình là 0,1. Bấm phím 9 liên tục 25 lần,25 số 9,Giới hạn 15-16 số hoặc co chữ/chuyển dạng scientific,FAIL,BUG-07
+TC-10,Input Editing,Kiểm tra bấm Backspace khi màn hình chỉ còn 1 số,Màn hình có số 5,1. Bấm phím ⌫ (Backspace),5,Màn hình phải chuyển về 0,FAIL,BUG-08
+TC-11,Input Validation,Kiểm tra thay đổi toán tử giữa chừng,Màn hình là 0,1. Nhập 5 -> 2. Bấm + -> 3. Bấm × -> 4. Nhập 2 -> 5. Bấm =,5 + × 2,Toán tử × thay thế + kết quả ra 10,FAIL,BUG-09
+TC-12,Basic Math,Kiểm tra tính phần trăm trong phép cộng,Màn hình là 0,1. Nhập 100 -> 2. Bấm + -> 3. Nhập 10 -> 4. Bấm % -> 5. Bấm =,100 + 10%,Kết quả phải bằng 110,FAIL,BUG-10
+TC-13,Memory,Kiểm tra chức năng nút C không được xóa Memory,Bộ nhớ đang lưu 50,1. Nhập 50 -> 2. Bấm MS -> 3. Nhập 99 -> 4. Bấm C -> 5. Bấm MR,MS: 50; C; MR,MR phải phục hồi lại được giá trị 50,FAIL,BUG-11
+TC-14,Memory,Kiểm tra chức năng nút M- (Memory Subtract),Bộ nhớ đang lưu 100,1. Nhập 100 bấm MS -> 2. Nhập 30 bấm M- -> 3. Bấm MR,100 - 30,MR phải hiển thị 70,FAIL,BUG-12
+TC-15,UI State,Kiểm tra đổi dấu trên số 0,Màn hình là 0,1. Màn hình đang là 0 -> 2. Bấm phím ±,±(0),Màn hình vẫn phải giữ nguyên là 0,FAIL,BUG-13
+TC-16,State,Kiểm tra bấm phím = lặp lại nhiều lần,Màn hình là 0,1. Nhập 5 + 2 = -> 2. Bấm tiếp phím =,5 + 2 = =,Lặp lại phép cộng cuối kết quả ra 9,FAIL,BUG-14
+TC-17,History,Kiểm tra chức năng Xóa lịch sử và thêm phép tính mới,Có 1 phép tính trong lịch sử,1. Tính 1+1=2 -> 2. Bấm Xóa lịch sử -> 3. Tính 2+2=4,Clear History,Lịch sử chỉ hiển thị duy nhất 2+2=4,FAIL,BUG-15
+TC-18,Advanced,Kiểm tra hàm tính bình phương,Màn hình là 0,1. Nhập 8 -> 2. Bấm x²,8²,Màn hình hiển thị 64,PASS,
+TC-19,Basic Math,Kiểm tra phép trừ cho kết quả số âm,Màn hình là 0,1. Nhập 10 -> 2. Bấm - -> 3. Nhập 25 -> 4. Bấm =,10 - 25,Màn hình hiển thị -15,PASS,
+TC-20,Clear State,Kiểm tra xóa toàn bộ trạng thái AC,Màn hình có phép tính dở,1. Nhập 123 + 45 -> 2. Bấm AC,AC,Màn hình quay về 0 reset mọi trạng thái,PASS,
+TC-21,History,Nhấp vào mục trong lịch sử để nạp lại số,Có mục lịch sử,1. Nhấp chuột vào thẻ lịch sử 15 + 25 = 40,Click History item,Màn hình máy tính nạp lại số 40,PASS,
+TC-22,Keyboard,Nhập bằng bàn phím máy tính thật,Màn hình là 0,1. Gõ phím cứng 1 2 3 trên bàn phím,Keyboard typing,Màn hình hiển thị 123,PASS,
+TC-23,Keyboard,Bấm Enter trên bàn phím để tính toán,Đã nhập 4 + 6,1. Nhấn phím Enter trên bàn phím,Keyboard Enter,Màn hình hiển thị kết quả 10,PASS,
+TC-24,Keyboard,Bấm Escape trên bàn phím để xóa tất cả,Đang có số trên màn hình,1. Nhấn phím Escape trên bàn phím,Keyboard Esc,Tương đương nút AC màn hình về 0,PASS,
+TC-25,Memory,Kiểm tra chức năng nút M+ cộng dồn,Bộ nhớ là 0,1. Nhập 50 bấm M+ -> 2. Nhập 20 bấm M+ -> 3. Bấm MR,50 + 20 trong mem,MR hiển thị 70 có biểu tượng M,PASS,
