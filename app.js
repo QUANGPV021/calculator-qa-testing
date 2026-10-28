@@ -1,120 +1,123 @@
 /**
- * SmartCalc Pro - Core Application & Buggy Engine
- * Mục đích: Ứng dụng máy tính bỏ túi đa chức năng phục vụ đồ án kiểm thử phần mềm.
- * Chứa 15 lỗi logic / UI / validation có chủ đích cho sinh viên & tester thực hành.
+ * SmartCalc Pro - Core Application & Planted Bug Engine
+ * Môn học: Đánh giá hiệu năng CSE3066
+ * Sinh viên: Phạm Văn Quang (23110342)
+ * 
+ * Danh mục 16 lỗi cài sẵn (Pre-planted Bugs) theo đúng 5 nhóm của Đề bài:
+ * 1. Functional (5 lỗi): SEED-01, SEED-02, SEED-03, SEED-04, SEED-05
+ * 2. Visual (3 lỗi): SEED-06, SEED-07, SEED-08
+ * 3. Content (3 lỗi): SEED-09, SEED-10, SEED-11
+ * 4. Performance (2 lỗi): SEED-12, SEED-13
+ * 5. Crash (3 lỗi): SEED-14, SEED-15, SEED-16
  */
 
-// ==========================================
-// 1. DATA STATE & CONFIGURATION
-// ==========================================
 const state = {
   currentInput: '0',
   previousInput: '',
   operation: null,
   waitingForSecondOperand: false,
   memoryValue: 0,
-  historyData: [], // Stores { expression, result, timestamp }
+  historyData: [],
   lastOperation: null,
-  lastOperand: null
+  lastOperand: null,
+  justCalculated: false,
+  isCrashed: false
 };
 
-// Danh mục 15 lỗi cài cắm (Bug Catalog)
+// 16 Lỗi cài cắm chuẩn theo Rubric và Form khảo sát
 const BUGS_CATALOG = [
+  // --- 1. FUNCTIONAL BUGS (5 lỗi) ---
   {
-    id: "BUG-01",
+    id: "SEED-01",
+    category: "Functional",
+    specType: "Trong đặc tả",
     severity: "Critical",
-    title: "Lỗi độ chính xác số thực (Floating-Point Precision)",
-    desc: "Tính toán số thập phân cơ bản như 0.1 + 0.2 cho ra 0.30000000000000004 thay vì 0.3 do không format kết quả chuẩn IEEE 754.",
-    steps: "1. Nhập '0.1' -> 2. Nhấn '+' -> 3. Nhập '0.2' -> 4. Nhấn '='",
+    srsReq: "FR-07 (Độ chính xác số học)",
+    title: "Sai số dấu phẩy động (Float Precision): 0.1 + 0.2 ra 0.30000000000000004",
+    desc: "Tính toán số thực không được làm tròn chuẩn hóa IEEE-754, gây sai số tích lũy nghiêm trọng.",
+    steps: "1. Nhập '0.1' -> 2. Bấm '+' -> 3. Nhập '0.2' -> 4. Bấm '='",
     expected: "0.3",
     actual: "0.30000000000000004",
-    repro: () => {
-      runCalculationSequence(['0', '.', '1', '+', '0', '.', '2', '=']);
-    }
+    file: "app.js (dòng performRawCalculation)",
+    repro: () => runSequence(['0', '.', '1', '+', '0', '.', '2', '='])
   },
   {
-    id: "BUG-02",
+    id: "SEED-02",
+    category: "Functional",
+    specType: "Trong đặc tả",
     severity: "Major",
-    title: "Cho phép nhập nhiều dấu chấm thập phân trong cùng 1 số",
-    desc: "Hệ thống không chặn việc người dùng nhập liên tiếp hoặc rải rác nhiều dấu chấm thập phân (VD: 5.2.3.1).",
-    steps: "1. Nhập '5' -> 2. Nhấn '.' -> 3. Nhập '2' -> 4. Nhấn '.' -> 5. Nhập '3'",
-    expected: "Chỉ cho phép 1 dấu chấm (5.23)",
+    srsReq: "FR-04 (Dấu chấm thập phân)",
+    title: "Cho phép nhập nhiều dấu chấm thập phân trong 1 số (5.2.3)",
+    desc: "Bộ kiểm tra dấu chấm chỉ kiểm tra ký tự liền kề cuối cùng, cho phép nhập chuỗi thập phân dị tật.",
+    steps: "1. Nhập '5' -> 2. Bấm '.' -> 3. Nhập '2' -> 4. Bấm '.' -> 5. Nhập '3'",
+    expected: "Chặn không cho nhập dấu chấm thứ 2 (chỉ nhận 5.23)",
     actual: "Màn hình hiển thị '5.2.3'",
+    file: "app.js (dòng inputDecimal)",
     repro: () => {
       resetCalculator();
-      inputDigit('5');
-      inputDecimal();
-      inputDigit('2');
-      inputDecimal(); // BUG: allows multiple
-      inputDigit('3');
+      inputDigit('5'); inputDecimal(); inputDigit('2'); inputDecimal(); inputDigit('3');
       updateDisplay();
     }
   },
   {
-    id: "BUG-03",
+    id: "SEED-03",
+    category: "Functional",
+    specType: "Trong đặc tả",
     severity: "Critical",
+    srsReq: "FR-09 (Chia cho 0)",
     title: "Phép chia cho 0 trả về 'Infinity' thay vì thông báo lỗi",
-    desc: "Khi thực hiện phép chia bất kỳ số nào cho 0, hệ thống xuất 'Infinity' và cho phép thực hiện tiếp các phép tính làm sai lệch hệ thống.",
-    steps: "1. Nhập '9' -> 2. Nhấn '÷' -> 3. Nhập '0' -> 4. Nhấn '='",
-    expected: "Hiển thị thông báo 'Cannot divide by zero' hoặc 'Error'",
-    actual: "Hiển thị 'Infinity'",
-    repro: () => {
-      runCalculationSequence(['9', '÷', '0', '=']);
-    }
+    desc: "Hệ thống không chặn phép chia cho 0, xuất chuỗi 'Infinity' và tiếp tục tính toán sai.",
+    steps: "1. Nhập '9' -> 2. Bấm '÷' -> 3. Nhập '0' -> 4. Bấm '='",
+    expected: "Hiển thị thông báo 'Cannot divide by 0' và khóa tính tiếp",
+    actual: "Màn hình hiển thị 'Infinity'",
+    file: "app.js (dòng performRawCalculation)",
+    repro: () => runSequence(['9', '÷', '0', '='])
   },
   {
-    id: "BUG-04",
+    id: "SEED-04",
+    category: "Functional",
+    specType: "Trong đặc tả",
     severity: "Major",
-    title: "Vi phạm thứ tự ưu tiên toán học (Operator Precedence)",
-    desc: "Khi tính toán chuỗi biểu thức 2 + 3 * 4 liên tiếp, hệ thống thực hiện tuần tự từ trái sang phải ((2 + 3) * 4 = 20) thay vì tuân theo BODMAS (14).",
-    steps: "1. Nhập '2' -> 2. Nhấn '+' -> 3. Nhập '3' -> 4. Nhấn '×' -> 5. Nhập '4' -> 6. Nhấn '='",
-    expected: "Kết quả đúng toán học là 14 (nhân chia trước cộng trừ sau)",
-    actual: "Kết quả trả về 20",
-    repro: () => {
-      runCalculationSequence(['2', '+', '3', '×', '4', '=']);
-    }
+    srsReq: "FR-08 (Thứ tự ưu tiên BODMAS)",
+    title: "Vi phạm thứ tự ưu tiên: 2 + 3 * 4 ra 20 thay vì 14",
+    desc: "Tính dồn tuần tự từ trái qua phải ngay khi bấm toán tử mới, không áp dụng quy tắc nhân chia trước cộng trừ sau.",
+    steps: "1. Nhập '2' -> 2. Bấm '+' -> 3. Nhập '3' -> 4. Bấm '×' -> 5. Nhập '4' -> 6. Bấm '='",
+    expected: "14 (Nhân trước cộng sau)",
+    actual: "20 ((2 + 3) * 4)",
+    file: "app.js (dòng handleOperator)",
+    repro: () => runSequence(['2', '+', '3', '×', '4', '='])
   },
   {
-    id: "BUG-05",
+    id: "SEED-05",
+    category: "Functional",
+    specType: "Trong đặc tả",
     severity: "Major",
-    title: "Căn bậc hai số âm trả về 'NaN'",
-    desc: "Nhấn nút tính căn bậc hai (√) khi số đang hiển thị là số âm (VD: -9) xuất hiện giá trị NaN không thân thiện.",
-    steps: "1. Nhập '9' -> 2. Nhấn '±' (thành -9) -> 3. Nhấn nút '√'",
-    expected: "Thông báo lỗi 'Invalid Input' hoặc chặn không cho tính",
-    actual: "Hiển thị chuỗi 'NaN'",
+    srsReq: "FR-11 (Căn bậc hai)",
+    title: "Căn bậc hai số âm xuất hiện chuỗi 'NaN'",
+    desc: "Không kiểm tra điều kiện số âm trước khi gọi Math.sqrt, gây lỗi hiển thị không thân thiện.",
+    steps: "1. Nhập '9' -> 2. Bấm '±' (thành -9) -> 3. Bấm '√'",
+    expected: "Thông báo lỗi 'Invalid Input'",
+    actual: "Màn hình hiển thị 'NaN'",
+    file: "app.js (dòng calcSquareRoot)",
     repro: () => {
       resetCalculator();
-      inputDigit('9');
-      toggleSign();
-      calcSquareRoot();
-      updateDisplay();
+      inputDigit('9'); toggleSign(); calcSquareRoot(); updateDisplay();
     }
   },
+
+  // --- 2. VISUAL BUGS (3 lỗi) ---
   {
-    id: "BUG-06",
-    severity: "Minor",
-    title: "Cho phép nhập nhiều số 0 vô nghĩa ở đầu (Leading Zeros)",
-    desc: "Người dùng có thể nhập liên tục nhiều số 0 ở đầu số nguyên, ví dụ '0008' thay vì tự động format thành '8'.",
-    steps: "1. Nhấn nút '0' nhiều lần -> 2. Nhấn nút '8'",
-    expected: "Chỉ hiển thị '8' (hoặc tối đa một số 0)",
-    actual: "Hiển thị '0008'",
-    repro: () => {
-      resetCalculator();
-      inputDigit('0');
-      inputDigit('0');
-      inputDigit('0');
-      inputDigit('8');
-      updateDisplay();
-    }
-  },
-  {
-    id: "BUG-07",
+    id: "SEED-06",
+    category: "Visual",
+    specType: "Trong đặc tả",
     severity: "Medium",
-    title: "Tràn giao diện màn hình khi nhập quá nhiều chữ số",
-    desc: "Không giới hạn độ dài chuỗi nhập hoặc tự động co kích thước chữ / chuyển sang e-notation, dẫn tới chữ số tràn ra khỏi màn hình.",
-    steps: "1. Nhập liên tục 25 chữ số 9",
-    expected: "Giới hạn 15 ký tự hoặc chuyển dạng 9.999e+24, không vỡ layout",
-    actual: "Chữ số tràn vỡ khung giao diện",
+    srsReq: "FR-05 (Giới hạn màn hình)",
+    title: "Tràn viền màn hình (Layout Overflow) khi nhập chuỗi số dài",
+    desc: "Màn hình không giới hạn 16 ký tự và CSS đặt overflow: visible khiến chữ số bị vỡ tràn ra ngoài khung máy tính.",
+    steps: "1. Bấm liên tục 25 phím số '9'",
+    expected: "Tự co cỡ chữ hoặc giới hạn 16 ký tự, hiển thị dạng 9.999e+24",
+    actual: "Dãy số tràn vỡ ra ngoài cạnh màn hình",
+    file: "style.css (.screen-main) & app.js (inputDigit)",
     repro: () => {
       resetCalculator();
       for (let i = 0; i < 25; i++) inputDigit('9');
@@ -122,40 +125,76 @@ const BUGS_CATALOG = [
     }
   },
   {
-    id: "BUG-08",
-    severity: "Medium",
-    title: "Nút Backspace (⌫) xóa hết số để lại chuỗi rỗng rác",
-    desc: "Khi chỉ còn 1 chữ số, nhấn Backspace biến currentInput thành chuỗi rỗng rỗng '' thay vì quay về '0', gây lỗi ở thao tác kế tiếp.",
-    steps: "1. Khi màn hình là '5', nhấn '⌫' -> 2. Nhấn '+' -> 3. Nhấn '2'",
-    expected: "Màn hình chuyển về '0' sau khi xóa",
-    actual: "Màn hình trống rỗng, tính toán tiếp sinh ra lỗi NaN",
+    id: "SEED-07",
+    category: "Visual",
+    specType: "Trong đặc tả",
+    severity: "Minor",
+    srsReq: "FR-13 (Đổi dấu và căn lề)",
+    title: "Đổi dấu số 0 biến thành '-0' và bị nhảy lệch lề hiển thị",
+    desc: "Khi bấm ± trên số 0, màn hình hiển thị '-0' và kích hoạt class làm lệch toàn bộ số sang mép trái giao diện.",
+    steps: "1. Màn hình đang là 0 -> 2. Bấm phím '±'",
+    expected: "Giữ nguyên '0' và căn lề phải chuẩn",
+    actual: "Hiển thị '-0' và bị thụt lề sang trái",
+    file: "app.js (toggleSign) & style.css",
     repro: () => {
       resetCalculator();
-      inputDigit('5');
-      backspace();
+      toggleSign();
       updateDisplay();
     }
   },
   {
-    id: "BUG-09",
-    severity: "Major",
-    title: "Nhấn liên tiếp các toán tử gây nối chuỗi toán tử lỗi",
-    desc: "Khi nhấn 5 rồi nhấn '+', sau đó đổi ý nhấn '×', hệ thống không thay thế toán tử mà ghi nhận lỗi hoặc biểu thức hỏng.",
-    steps: "1. Nhập '5' -> 2. Nhấn '+' -> 3. Nhấn '×' -> 4. Nhập '2' -> 5. Nhấn '='",
-    expected: "Toán tử '×' thay thế '+', kết quả 5 × 2 = 10",
-    actual: "Bị tính toán sai hoặc màn hình expression bị lỗi '5 + ×'",
+    id: "SEED-08",
+    category: "Visual",
+    specType: "Trong đặc tả",
+    severity: "Minor",
+    srsReq: "FR-17 (Nhật ký lịch sử)",
+    title: "Thẻ lịch sử tính toán bị vỡ khung khi biểu thức dài",
+    desc: "Khung lịch sử không bẻ dòng biểu thức (word-break), khiến thẻ lịch sử bị tràn thanh cuộn ngang xộc xệch.",
+    steps: "1. Nhập phép tính dài: 123456789 + 987654321 = -> 2. Nhìn thẻ bên phải",
+    expected: "Căn chỉnh gọn gàng trong thẻ",
+    actual: "Vỡ layout thẻ lịch sử",
+    file: "style.css (.history-expr)",
     repro: () => {
-      runCalculationSequence(['5', '+', '×', '2', '=']);
+      resetCalculator();
+      state.currentInput = "123456789";
+      handleOperator('+');
+      state.currentInput = "987654321";
+      calculate();
+      updateDisplay();
+    }
+  },
+
+  // --- 3. CONTENT BUGS (3 lỗi) ---
+  {
+    id: "SEED-09",
+    category: "Content",
+    specType: "Trong đặc tả",
+    severity: "Minor",
+    srsReq: "FR-03 (Chặn số 0 đầu)",
+    title: "Cho phép nhập nhiều số 0 vô nghĩa ở đầu (0008)",
+    desc: "Hệ thống không chuẩn hóa loại bỏ số 0 ở đầu, hiển thị chuỗi '0008' gây sai lệch định dạng.",
+    steps: "1. Bấm '0' ba lần -> 2. Bấm '8'",
+    expected: "Tự động chuẩn hóa hiển thị '8'",
+    actual: "Hiển thị '0008'",
+    file: "app.js (inputDigit)",
+    repro: () => {
+      resetCalculator();
+      inputDigit('0'); inputDigit('0'); inputDigit('0'); inputDigit('8');
+      updateDisplay();
     }
   },
   {
-    id: "BUG-10",
+    id: "SEED-10",
+    category: "Content",
+    specType: "Trong đặc tả",
     severity: "Major",
-    title: "Lỗi tính phần trăm (%) trong phép cộng/trừ",
-    desc: "Biểu thức '100 + 10%' trong máy tính thông thường phải bằng 110 (100 + 10% của 100), nhưng hệ thống tính 10% = 0.1 -> ra 100.1.",
-    steps: "1. Nhập '100' -> 2. Nhấn '+' -> 3. Nhập '10' -> 4. Nhấn '%' -> 5. Nhấn '='",
+    srsReq: "FR-14 (Tính phần trăm)",
+    title: "Sai nội dung công thức phần trăm: 100 + 10% ra 100.1 thay vì 110",
+    desc: "Quy tắc máy tính thông dụng 'A + B%' nghĩa là A + (A*B%), nhưng code chia thẳng 10% thành 0.1.",
+    steps: "1. Nhập 100 -> 2. Bấm + -> 3. Nhập 10 -> 4. Bấm % -> 5. Bấm =",
     expected: "110",
     actual: "100.1",
+    file: "app.js (calcPercent)",
     repro: () => {
       resetCalculator();
       inputDigit('1'); inputDigit('0'); inputDigit('0');
@@ -167,88 +206,122 @@ const BUGS_CATALOG = [
     }
   },
   {
-    id: "BUG-11",
-    severity: "Medium",
-    title: "Nút 'C' (Clear Entry) xóa luôn bộ nhớ tạm Memory",
-    desc: "Nút C chỉ được phép xóa giá trị đang nhập hiện tại, nhưng code lại reset luôn cả memoryValue = 0.",
-    steps: "1. Nhập '50' -> 2. Nhấn 'MS' -> 3. Nhập '99' -> 4. Nhấn 'C' -> 5. Nhấn 'MR'",
-    expected: "MR phải gọi lại được 50",
-    actual: "MR trả về 0 vì bộ nhớ đã bị nút C xóa mất",
+    id: "SEED-11",
+    category: "Content",
+    specType: "Ngoài đặc tả",
+    severity: "Minor",
+    srsReq: "Ngoài SRS (Nội dung nhãn giao diện)",
+    title: "Nút 'C' bị ghi sai Tooltip thành 'Clear All Data & Memory'",
+    desc: "Nút C (Clear Entry) chỉ xóa giá trị đang nhập nhưng tooltip lại ghi thông tin sai lệch là xóa toàn bộ dữ liệu.",
+    steps: "1. Rê chuột lên nút 'C' trên bàn phím",
+    expected: "Tooltip: 'Clear Entry (Xóa mục hiện tại)'",
+    actual: "Tooltip hiển thị: 'Clear All Data & Memory'",
+    file: "index.html (nút #btnC)",
+    repro: () => {
+      alert("Nội dung tooltip của nút C đang bị ghi nhầm thành: 'Clear All Data & Memory'!");
+    }
+  },
+
+  // --- 4. PERFORMANCE BUGS (2 lỗi) ---
+  {
+    id: "SEED-12",
+    category: "Performance",
+    specType: "Ngoài đặc tả",
+    severity: "Major",
+    srsReq: "NFR-01 (Thời gian phản hồi < 50ms)",
+    title: "Đơ lag giao diện > 3 giây khi tính bình phương lặp (CPU Heavy Loop)",
+    desc: "Tính năng bình phương x² bị chèn một vòng lặp đồng bộ 500,000,000 vòng lặp trên Main Thread làm trình duyệt đóng băng hoàn toàn > 3.5 giây.",
+    steps: "1. Nhập số '5' -> 2. Bấm nút 'x²'",
+    expected: "Kết quả 25 hiển thị ngay lập tức (< 10ms)",
+    actual: "Trình duyệt bị treo cứng hơn 3 giây rồi mới hiển thị",
+    file: "app.js (calcSquare)",
     repro: () => {
       resetCalculator();
-      inputDigit('5'); inputDigit('0');
-      memoryStore();
-      inputDigit('9'); inputDigit('9');
-      clearEntry(); // BUG: wipes memory
-      memoryRecall();
+      inputDigit('5');
+      calcSquare(true); // kích hoạt lag
       updateDisplay();
     }
   },
   {
-    id: "BUG-12",
+    id: "SEED-13",
+    category: "Performance",
+    specType: "Ngoài đặc tả",
     severity: "Major",
+    srsReq: "NFR-02 (Giải phóng bộ nhớ RAM)",
+    title: "Rò rỉ bộ nhớ (Memory Leak) khi bấm Xóa lịch sử",
+    desc: "Nút 'Xóa lịch sử' chỉ xóa thẻ HTML mà không gán `historyData = []`, tích lũy hàng nghìn phép tính trong RAM và phục hồi lại khi tính mới.",
+    steps: "1. Tính 1+1=2 -> 2. Bấm Xóa lịch sử -> 3. Tính 2+2=4",
+    expected: "Bộ nhớ được giải phóng, chỉ lưu duy nhất 2+2=4",
+    actual: "Phép tính cũ 1+1=2 bị giữ lại trong RAM và hiện trở lại",
+    file: "app.js (clearHistory)",
+    repro: () => {
+      runSequence(['1', '+', '1', '=']);
+      clearHistory();
+      setTimeout(() => runSequence(['2', '+', '2', '=']), 300);
+    }
+  },
+
+  // --- 5. CRASH BUGS (3 lỗi) ---
+  {
+    id: "SEED-14",
+    category: "Crash",
+    specType: "Ngoài đặc tả",
+    severity: "Critical",
+    srsReq: "NFR-04 (Tính ổn định hệ thống)",
+    title: "Sập ứng dụng (Crash / Freeze) khi xóa rỗng rồi bấm tính toán",
+    desc: "Bấm Backspace khi còn 1 số làm currentInput thành chuỗi rỗng '', khi bấm tiếp toán tử sinh ra ngoại lệ chưa xử lý khiến toàn bộ máy tính bị khóa đơ.",
+    steps: "1. Có số 5 trên màn hình -> 2. Bấm ⌫ -> 3. Bấm '+' -> 4. Bấm '='",
+    expected: "Màn hình chuyển về '0', không crash",
+    actual: "Ném ngoại lệ unhandled exception, máy tính bị sập treo",
+    file: "app.js (backspace & calculate)",
+    repro: () => {
+      resetCalculator();
+      inputDigit('5');
+      backspace();
+      triggerCrashState("Crash do chuỗi rỗng!");
+    }
+  },
+  {
+    id: "SEED-15",
+    category: "Crash",
+    specType: "Ngoài đặc tả",
+    severity: "Critical",
+    srsReq: "NFR-04 (Tính ổn định hệ thống)",
+    title: "Trắng màn hình (White Screen) khi nhập chuỗi toán tử đặc biệt",
+    desc: "Bấm liên tiếp '÷' rồi bấm '×' rồi '=' mà không có số thứ hai làm bộ xử lý ném lỗi cú pháp, kích hoạt màn hình trắng xóa báo lỗi hệ thống.",
+    steps: "1. Bấm 8 -> 2. Bấm ÷ -> 3. Bấm × -> 4. Bấm =",
+    expected: "Báo lỗi cú pháp nhẹ nhàng hoặc bỏ qua",
+    actual: "Màn hình biến thành màu trắng với thông báo Unhandled Fatal Error",
+    file: "app.js (handleOperator crash branch)",
+    repro: () => {
+      triggerFatalWhiteScreen();
+    }
+  },
+  {
+    id: "SEED-16",
+    category: "Functional",
+    specType: "Ngoài đặc tả",
+    severity: "Major",
+    srsReq: "Ngoài SRS (Logic bộ nhớ tạm M-)",
     title: "Nút 'M-' (Memory Subtract) tính ngược thành cộng dồn",
-    desc: "Logic của nút M- bị lập trình viên viết nhầm dấu thành '+=' thay vì '-='.",
-    steps: "1. Nhập '100' -> 2. Nhấn 'MS' (Memory = 100) -> 3. Nhập '30' -> 4. Nhấn 'M-' -> 5. Nhấn 'MR'",
+    desc: "Lập trình viên viết nhầm toán tử `+=` thay vì `-=` trong hàm memorySubtract.",
+    steps: "1. Lưu 100 vào MS -> 2. Nhập 30 -> 3. Bấm M- -> 4. Bấm MR",
     expected: "MR = 70 (100 - 30)",
-    actual: "MR = 130 (bị cộng thêm 30)",
+    actual: "MR = 130 (bị cộng dồn 30)",
+    file: "app.js (memorySubtract)",
     repro: () => {
       resetCalculator();
       inputDigit('1'); inputDigit('0'); inputDigit('0');
       memoryStore();
       inputDigit('3'); inputDigit('0');
-      memorySubtract(); // BUG: adds instead of subtracts
+      memorySubtract();
       memoryRecall();
       updateDisplay();
-    }
-  },
-  {
-    id: "BUG-13",
-    severity: "Minor",
-    title: "Đổi dấu số 0 biến thành '-0'",
-    desc: "Nhấn nút '±' khi màn hình là số 0 tạo ra giá trị '-0' gây sai lệch kiểm thử giá trị ranh giới.",
-    steps: "1. Màn hình đang là '0' -> 2. Nhấn '±'",
-    expected: "Vẫn là '0'",
-    actual: "Hiển thị '-0'",
-    repro: () => {
-      resetCalculator();
-      toggleSign(); // BUG: turns 0 into -0
-      updateDisplay();
-    }
-  },
-  {
-    id: "BUG-14",
-    severity: "Medium",
-    title: "Nhấn phím '=' lần 2 bị reset kết quả về 0",
-    desc: "Máy tính chuẩn khi nhấn '=' liên tục sẽ lặp lại phép tính cuối (VD: 5 + 2 = 7 = 9 = 11). Ứng dụng này nhấn '=' lần 2 sẽ xóa hoặc về 0.",
-    steps: "1. Nhập '5' -> 2. Nhấn '+' -> 3. Nhập '2' -> 4. Nhấn '=' (ra 7) -> 5. Nhấn '=' lần nữa",
-    expected: "9 (tiếp tục cộng 2)",
-    actual: "Màn hình chuyển về '0'",
-    repro: () => {
-      runCalculationSequence(['5', '+', '2', '=', '=']);
-    }
-  },
-  {
-    id: "BUG-15",
-    severity: "Major",
-    title: "Xóa lịch sử (Clear History) bị rò rỉ dữ liệu (Memory Leak)",
-    desc: "Nút 'Xóa lịch sử' chỉ xóa các thẻ HTML trên giao diện nhưng không xóa mảng historyData trong code; khi thực hiện phép tính mới, các mục cũ bị phục hồi lại.",
-    steps: "1. Thực hiện phép tính 1+1=2 -> 2. Bấm 'Xóa lịch sử' (danh sách trống) -> 3. Thực hiện phép tính 2+2=4",
-    expected: "Lịch sử chỉ chứa duy nhất phép tính 2+2=4",
-    actual: "Phép tính 1+1=2 cũ xuất hiện trở lại cùng với 2+2=4",
-    repro: () => {
-      runCalculationSequence(['1', '+', '1', '=']);
-      clearHistory();
-      setTimeout(() => {
-        runCalculationSequence(['2', '+', '2', '=']);
-      }, 400);
     }
   }
 ];
 
-// ==========================================
-// 2. DOM ELEMENTS
-// ==========================================
+// DOM Elements
 const currentDisplayEl = document.getElementById('currentDisplay');
 const historyDisplayEl = document.getElementById('historyDisplay');
 const memIndicatorEl = document.getElementById('memIndicator');
@@ -256,7 +329,6 @@ const historyListEl = document.getElementById('historyList');
 const statCountEl = document.getElementById('statCount');
 const statMemoryEl = document.getElementById('statMemory');
 
-// Modals
 const qaDrawerEl = document.getElementById('qaDrawer');
 const docsModalEl = document.getElementById('docsModal');
 const btnToggleQAMode = document.getElementById('btnToggleQAMode');
@@ -265,11 +337,10 @@ const btnCloseQA = document.getElementById('btnCloseQA');
 const btnCloseDocs = document.getElementById('btnCloseDocs');
 const bugsListContainer = document.getElementById('bugsListContainer');
 
-// ==========================================
-// 3. CORE CALCULATOR LOGIC (WITH INTENTIONAL BUGS)
-// ==========================================
-
+// Core Calculation Logic
 function updateDisplay() {
+  if (state.isCrashed) return;
+
   currentDisplayEl.textContent = state.currentInput;
   if (state.operation && state.previousInput !== '') {
     historyDisplayEl.textContent = `${state.previousInput} ${state.operation}`;
@@ -277,7 +348,15 @@ function updateDisplay() {
     historyDisplayEl.textContent = '';
   }
 
-  // Memory indicator
+  // Visual Bug SEED-07: lệch lề khi -0
+  if (state.currentInput === '-0') {
+    currentDisplayEl.style.textAlign = 'left';
+    currentDisplayEl.style.paddingLeft = '10px';
+  } else {
+    currentDisplayEl.style.textAlign = 'right';
+    currentDisplayEl.style.paddingLeft = '0';
+  }
+
   if (state.memoryValue !== 0) {
     memIndicatorEl.classList.remove('hidden');
   } else {
@@ -288,6 +367,8 @@ function updateDisplay() {
 }
 
 function inputDigit(digit) {
+  if (state.isCrashed) return;
+
   if (state.justCalculated) {
     state.currentInput = digit;
     state.justCalculated = false;
@@ -297,32 +378,28 @@ function inputDigit(digit) {
     state.currentInput = digit;
     state.waitingForSecondOperand = false;
   } else {
-    // BUG-06: Allows multiple leading zeros if not properly handled
-    // If current is '0' and typing '0', it could become '00' or typing '0008'
+    // Content Bug SEED-09: 0008
     if (state.currentInput === '0' && digit === '0') {
-      state.currentInput = '00'; // BUG-06 demonstration
+      state.currentInput = '00';
     } else if (state.currentInput === '00' && digit !== '0') {
-      state.currentInput = state.currentInput + digit; // results in 008
+      state.currentInput = state.currentInput + digit;
     } else if (state.currentInput === '0' && digit !== '0') {
       state.currentInput = digit;
     } else {
-      // BUG-07: No max length guard, overflows screen freely
+      // Visual Bug SEED-06: No max length guard
       state.currentInput = state.currentInput + digit;
     }
   }
 }
 
 function inputDecimal() {
-  // BUG-02: Flawed decimal check allows multiple dots
-  // If state is waiting for second operand, start fresh
+  if (state.isCrashed) return;
   if (state.waitingForSecondOperand) {
     state.currentInput = '0.';
     state.waitingForSecondOperand = false;
     return;
   }
-
-  // Intentional Bug #2: Only checks if the last character is a dot,
-  // allowing strings like '12.3.4'
+  // Functional Bug SEED-02: allows 5.2.3
   if (state.currentInput.endsWith('.')) {
     return;
   }
@@ -330,12 +407,11 @@ function inputDecimal() {
 }
 
 function handleOperator(nextOp) {
+  if (state.isCrashed) return;
   const inputValue = parseFloat(state.currentInput);
 
   if (state.operation && state.waitingForSecondOperand) {
-    // BUG-09: Instead of smoothly replacing the operator,
-    // it appends or messes with previous expression
-    state.operation = state.operation + ' ' + nextOp; // Concat bug!
+    state.operation = state.operation + ' ' + nextOp;
     updateDisplay();
     return;
   }
@@ -343,7 +419,7 @@ function handleOperator(nextOp) {
   if (state.previousInput === '') {
     state.previousInput = state.currentInput;
   } else if (state.operation) {
-    // BUG-04: Immediate sequential calculation without operator precedence
+    // Functional Bug SEED-04: immediate sequential calculation without BODMAS
     const result = performRawCalculation(state.operation, parseFloat(state.previousInput), inputValue);
     state.currentInput = `${result}`;
     state.previousInput = `${result}`;
@@ -354,14 +430,13 @@ function handleOperator(nextOp) {
 }
 
 function performRawCalculation(op, firstVal, secondVal) {
-  // Normalize operator if broken by BUG-09
   if (op.includes(' ')) {
     op = op.split(' ').pop();
   }
 
   switch (op) {
     case '+':
-      // BUG-01: Raw IEEE 754 addition without rounding
+      // Functional Bug SEED-01: IEEE-754 precision error
       return firstVal + secondVal;
     case '-':
     case '−':
@@ -371,10 +446,8 @@ function performRawCalculation(op, firstVal, secondVal) {
       return firstVal * secondVal;
     case '÷':
     case '/':
-      // BUG-03: Division by zero returns Infinity
-      if (secondVal === 0) {
-        return Infinity; // BUG: Not throwing error or showing "Cannot divide by 0"
-      }
+      // Functional Bug SEED-03: Division by zero returns Infinity
+      if (secondVal === 0) return Infinity;
       return firstVal / secondVal;
     default:
       return secondVal;
@@ -382,10 +455,17 @@ function performRawCalculation(op, firstVal, secondVal) {
 }
 
 function calculate() {
+  if (state.isCrashed) return;
+
+  // Crash Bug SEED-14: crash if empty string
+  if (state.currentInput === '') {
+    triggerCrashState("Lỗi nghiêm trọng: Toán hạng rỗng gây Uncaught TypeError!");
+    return;
+  }
+
   let firstVal = parseFloat(state.previousInput);
   let secondVal = parseFloat(state.currentInput);
 
-  // BUG-14: Pressing '=' when no operation resets display to '0'
   if (!state.operation) {
     state.currentInput = '0';
     updateDisplay();
@@ -394,7 +474,7 @@ function calculate() {
 
   const rawResult = performRawCalculation(state.operation, firstVal, secondVal);
   const expression = `${state.previousInput} ${state.operation} ${state.currentInput}`;
-  
+
   state.currentInput = `${rawResult}`;
   state.previousInput = '';
   state.lastOperation = state.operation;
@@ -407,9 +487,9 @@ function calculate() {
 }
 
 function backspace() {
-  // BUG-08: When length is 1 or '0', leaves empty string '' instead of '0'
+  if (state.isCrashed) return;
   if (state.currentInput.length <= 1) {
-    state.currentInput = ''; // BUG-08: Empty string!
+    state.currentInput = ''; // Empty string leads to SEED-14!
   } else {
     state.currentInput = state.currentInput.slice(0, -1);
   }
@@ -422,21 +502,21 @@ function clearAll() {
   state.waitingForSecondOperand = false;
   state.lastOperation = null;
   state.lastOperand = null;
+  state.isCrashed = false;
+  document.querySelector('.calculator-card').style.opacity = '1';
+  document.querySelector('.calculator-card').style.filter = 'none';
 }
 
 function clearEntry() {
   state.currentInput = '0';
-  // BUG-11: Clearing entry accidentally wipes Memory!
-  state.memoryValue = 0;
 }
 
 function toggleSign() {
-  // BUG-13: Toggling sign on '0' results in '-0'
+  // Visual/Content Bug SEED-07: -0
   if (state.currentInput === '0') {
     state.currentInput = '-0';
     return;
   }
-
   if (state.currentInput.startsWith('-')) {
     state.currentInput = state.currentInput.slice(1);
   } else {
@@ -446,13 +526,25 @@ function toggleSign() {
 
 function calcSquareRoot() {
   const val = parseFloat(state.currentInput);
-  // BUG-05: Negative square root outputs NaN without error message
+  // Functional Bug SEED-05: sqrt(-9) = NaN
   const result = Math.sqrt(val);
   state.currentInput = `${result}`;
   state.waitingForSecondOperand = true;
 }
 
-function calcSquare() {
+function calcSquare(triggerLag = true) {
+  // Performance Bug SEED-12: CPU Heavy Loop > 3.5s
+  if (triggerLag) {
+    const startTime = performance.now();
+    let counter = 0;
+    // Vòng lặp nặng làm treo Main Thread
+    for (let i = 0; i < 400000000; i++) {
+      counter += (i % 2);
+    }
+    const elapsed = Math.round(performance.now() - startTime);
+    console.warn(`[PERFORMANCE BUG SEED-12] Thao tác bị nghẽn trong: ${elapsed}ms`);
+  }
+
   const val = parseFloat(state.currentInput);
   state.currentInput = `${val * val}`;
   state.waitingForSecondOperand = true;
@@ -460,12 +552,11 @@ function calcSquare() {
 
 function calcPercent() {
   const val = parseFloat(state.currentInput);
-  // BUG-10: In standard arithmetic, 100 + 10% should be 100 + (100 * 0.1) = 110.
-  // Here it strictly divides by 100 without multiplying by previous base!
+  // Content Bug SEED-10: 100 + 10% ra 100.1
   state.currentInput = `${val / 100}`;
 }
 
-// Memory Operations
+// Memory Functions
 function memoryClear() {
   state.memoryValue = 0;
   updateDisplay();
@@ -484,8 +575,8 @@ function memoryAdd() {
 }
 
 function memorySubtract() {
-  // BUG-12: M- adds instead of subtracts!
-  state.memoryValue += parseFloat(state.currentInput) || 0; // BUG: Written as += instead of -=
+  // Bug SEED-16: M- nhầm thành cộng dồn +=
+  state.memoryValue += parseFloat(state.currentInput) || 0;
   state.waitingForSecondOperand = true;
   updateDisplay();
 }
@@ -496,15 +587,14 @@ function memoryStore() {
   updateDisplay();
 }
 
-// History & Statistics
+// History
 function addHistory(expression, result) {
   const item = {
     id: Date.now(),
     expression,
     result,
-    time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    time: new Date().toLocaleTimeString('vi-VN')
   };
-
   state.historyData.unshift(item);
   renderHistoryUI();
 }
@@ -525,7 +615,6 @@ function renderHistoryUI() {
       </div>
     `).join('');
 
-    // Click history to restore result
     historyListEl.querySelectorAll('.history-item').forEach(el => {
       el.addEventListener('click', () => {
         state.currentInput = el.getAttribute('data-res');
@@ -533,19 +622,45 @@ function renderHistoryUI() {
       });
     });
   }
-
   statCountEl.textContent = state.historyData.length;
 }
 
 function clearHistory() {
-  // BUG-15: Empties DOM list but leaks data by failing to clear state.historyData = []
+  // Performance Bug SEED-13: Chỉ xóa DOM, không xóa mảng RAM historyData!
   historyListEl.innerHTML = `
     <div class="empty-state">
       <p>Chưa có phép tính nào được thực hiện.</p>
-      <small>Lịch sử đã xóa.</small>
+      <small>Lịch sử đã xóa trên giao diện.</small>
     </div>
   `;
-  // state.historyData = []; // <--- INTENTIONALLY COMMENTED OUT TO INTRODUCE BUG-15
+  // state.historyData = []; // Bị comment out cố ý gây rò rỉ RAM
+}
+
+// Crash Simulator
+function triggerCrashState(reason) {
+  state.isCrashed = true;
+  currentDisplayEl.textContent = "CRASH: FATAL ERROR";
+  currentDisplayEl.style.color = "#f43f5e";
+  currentDisplayEl.style.fontSize = "1.5rem";
+  const card = document.querySelector('.calculator-card');
+  card.style.filter = "grayscale(80%)";
+  card.style.border = "2px solid #ef4444";
+  alert(`[CRASH BUG SEED-14] Ứng dụng đã bị sập (Fatal Crash)!\nNguyên nhân: ${reason}\nVui lòng nhấn nút 'AC' để khởi động lại máy tính.`);
+}
+
+function triggerFatalWhiteScreen() {
+  const body = document.body;
+  body.innerHTML = `
+    <div style="background:#fff; color:#000; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; font-family:sans-serif; text-align:center; padding:2rem;">
+      <h1 style="font-size:3rem; margin-bottom:1rem; color:#dc2626;">💥 500 - Application Crashed (White Screen)</h1>
+      <p style="font-size:1.2rem; color:#374151; max-width:600px;">
+        <strong>[CRASH BUG SEED-15]</strong> Máy tính gặp ngoại lệ chưa xử lý khi kết hợp chuỗi toán tử đặc biệt không có toán hạng.
+      </p>
+      <button onclick="location.reload()" style="margin-top:2rem; padding:0.8rem 1.8rem; font-size:1rem; font-weight:bold; background:#2563eb; color:#fff; border:none; border-radius:8px; cursor:pointer;">
+        🔄 Tải lại trang (F5) để phục hồi
+      </button>
+    </div>
+  `;
 }
 
 function resetCalculator() {
@@ -553,35 +668,20 @@ function resetCalculator() {
   updateDisplay();
 }
 
-// ==========================================
-// 4. AUTOMATED REPRODUCTION HELPER FOR QA
-// ==========================================
-function runCalculationSequence(keys) {
+function runSequence(keys) {
   resetCalculator();
-  let delay = 0;
-  keys.forEach((key, idx) => {
+  keys.forEach((k, idx) => {
     setTimeout(() => {
-      simulateKey(key);
+      if (!isNaN(k)) inputDigit(k);
+      else if (k === '.') inputDecimal();
+      else if (['+', '-', '−', '×', '*', '÷', '/'].includes(k)) handleOperator(k);
+      else if (k === '=') calculate();
       updateDisplay();
     }, idx * 150);
   });
 }
 
-function simulateKey(key) {
-  if (!isNaN(key)) {
-    inputDigit(key);
-  } else if (key === '.') {
-    inputDecimal();
-  } else if (['+', '-', '−', '×', '*', '÷', '/'].includes(key)) {
-    handleOperator(key);
-  } else if (key === '=') {
-    calculate();
-  }
-}
-
-// ==========================================
-// 5. EVENT LISTENERS
-// ==========================================
+// Keypad Event Listeners
 document.querySelector('.calc-keypad').addEventListener('click', (e) => {
   const btn = e.target.closest('button');
   if (!btn) return;
@@ -590,108 +690,63 @@ document.querySelector('.calc-keypad').addEventListener('click', (e) => {
   const val = btn.dataset.val;
 
   switch (action) {
-    case 'number':
-      inputDigit(val);
-      break;
-    case 'decimal':
-      inputDecimal();
-      break;
-    case 'operator':
-      handleOperator(val);
-      break;
-    case 'calculate':
-      calculate();
-      break;
-    case 'clear-all':
-      clearAll();
-      break;
-    case 'clear-entry':
-      clearEntry();
-      break;
-    case 'backspace':
-      backspace();
-      break;
-    case 'toggle-sign':
-      toggleSign();
-      break;
-    case 'sqrt':
-      calcSquareRoot();
-      break;
-    case 'square':
-      calcSquare();
-      break;
-    case 'percent':
-      calcPercent();
-      break;
-    case 'mc':
-      memoryClear();
-      break;
-    case 'mr':
-      memoryRecall();
-      break;
-    case 'm-plus':
-      memoryAdd();
-      break;
-    case 'm-minus':
-      memorySubtract();
-      break;
-    case 'ms':
-      memoryStore();
-      break;
+    case 'number': inputDigit(val); break;
+    case 'decimal': inputDecimal(); break;
+    case 'operator': handleOperator(val); break;
+    case 'calculate': calculate(); break;
+    case 'clear-all': clearAll(); break;
+    case 'clear-entry': clearEntry(); break;
+    case 'backspace': backspace(); break;
+    case 'toggle-sign': toggleSign(); break;
+    case 'sqrt': calcSquareRoot(); break;
+    case 'square': calcSquare(true); break;
+    case 'percent': calcPercent(); break;
+    case 'mc': memoryClear(); break;
+    case 'mr': memoryRecall(); break;
+    case 'm-plus': memoryAdd(); break;
+    case 'm-minus': memorySubtract(); break;
+    case 'ms': memoryStore(); break;
   }
-
   updateDisplay();
 });
 
-// Physical Keyboard Support
+// Physical Keyboard
 window.addEventListener('keydown', (e) => {
   if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
-
-  if (!isNaN(e.key)) {
-    inputDigit(e.key);
-  } else if (e.key === '.') {
-    inputDecimal();
-  } else if (e.key === '+' || e.key === '-') {
-    handleOperator(e.key);
-  } else if (e.key === '*') {
-    handleOperator('×');
-  } else if (e.key === '/') {
-    e.preventDefault();
-    handleOperator('÷');
-  } else if (e.key === 'Enter' || e.key === '=') {
-    e.preventDefault();
-    calculate();
-  } else if (e.key === 'Backspace') {
-    backspace();
-  } else if (e.key === 'Escape') {
-    clearAll();
-  }
+  if (!isNaN(e.key)) inputDigit(e.key);
+  else if (e.key === '.') inputDecimal();
+  else if (e.key === '+' || e.key === '-') handleOperator(e.key);
+  else if (e.key === '*') handleOperator('×');
+  else if (e.key === '/') { e.preventDefault(); handleOperator('÷'); }
+  else if (e.key === 'Enter' || e.key === '=') { e.preventDefault(); calculate(); }
+  else if (e.key === 'Backspace') backspace();
+  else if (e.key === 'Escape') clearAll();
   updateDisplay();
 });
 
 document.getElementById('btnClearHistory').addEventListener('click', clearHistory);
 
-// ==========================================
-// 6. QA INSPECTOR & MODALS LOGIC
-// ==========================================
+// Render Bugs in QA Inspector
 function renderBugsCatalog(filter = 'all') {
-  const filtered = filter === 'all' 
-    ? BUGS_CATALOG 
-    : BUGS_CATALOG.filter(b => b.severity.toLowerCase() === filter.toLowerCase());
+  const filtered = filter === 'all'
+    ? BUGS_CATALOG
+    : BUGS_CATALOG.filter(b => b.category.toLowerCase() === filter.toLowerCase() || b.severity.toLowerCase() === filter.toLowerCase());
 
   bugsListContainer.innerHTML = filtered.map(bug => `
     <div class="bug-card">
       <div class="bug-card-top">
         <div class="bug-id-title">
           <span class="bug-id">${bug.id}</span>
+          <span class="bug-category-tag tag-${bug.category}">${bug.category}</span>
           <span class="bug-title">${bug.title}</span>
         </div>
         <span class="severity-tag sev-${bug.severity}">${bug.severity}</span>
       </div>
-      <p class="bug-desc">${bug.desc}</p>
+      <p class="bug-desc"><strong>Đặc tả:</strong> ${bug.srsReq} (${bug.specType})<br>${bug.desc}</p>
       <div class="bug-repro">
-        <strong>Các bước tái hiện (Steps):</strong> ${bug.steps}<br>
-        <strong>Kỳ vọng (Expected):</strong> ${bug.expected} | <strong>Thực tế (Actual):</strong> ${bug.actual}
+        <strong>Các bước tái hiện:</strong> ${bug.steps}<br>
+        <strong>Kỳ vọng:</strong> ${bug.expected} | <strong>Thực tế:</strong> ${bug.actual}<br>
+        <strong>File code:</strong> <code>${bug.file}</code>
       </div>
       <button class="btn-trigger-bug" data-bug-id="${bug.id}">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -702,30 +757,24 @@ function renderBugsCatalog(filter = 'all') {
     </div>
   `).join('');
 
-  // Attach reproduce buttons
   bugsListContainer.querySelectorAll('.btn-trigger-bug').forEach(btn => {
     btn.addEventListener('click', () => {
-      const bugId = btn.dataset.bugId;
-      const targetBug = BUGS_CATALOG.find(b => b.id === bugId);
-      if (targetBug && targetBug.repro) {
+      const bug = BUGS_CATALOG.find(b => b.id === btn.dataset.bugId);
+      if (bug && bug.repro) {
         qaDrawerEl.classList.add('hidden');
-        targetBug.repro();
+        bug.repro();
       }
     });
   });
 }
 
-// QA Drawer Open/Close
 btnToggleQAMode.addEventListener('click', () => {
   renderBugsCatalog('all');
   qaDrawerEl.classList.remove('hidden');
 });
 
-btnCloseQA.addEventListener('click', () => {
-  qaDrawerEl.classList.add('hidden');
-});
+btnCloseQA.addEventListener('click', () => qaDrawerEl.classList.add('hidden'));
 
-// QA Filter Buttons
 document.querySelectorAll('.filter-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -734,14 +783,8 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
   });
 });
 
-// Docs Modal Open/Close & Tabs
-btnDocsModal.addEventListener('click', () => {
-  docsModalEl.classList.remove('hidden');
-});
-
-btnCloseDocs.addEventListener('click', () => {
-  docsModalEl.classList.add('hidden');
-});
+btnDocsModal.addEventListener('click', () => docsModalEl.classList.remove('hidden'));
+btnCloseDocs.addEventListener('click', () => docsModalEl.classList.add('hidden'));
 
 document.querySelectorAll('.tab-btn').forEach(tab => {
   tab.addEventListener('click', () => {
@@ -752,12 +795,10 @@ document.querySelectorAll('.tab-btn').forEach(tab => {
   });
 });
 
-// Close modal when clicking outside
 window.addEventListener('click', (e) => {
   if (e.target === qaDrawerEl) qaDrawerEl.classList.add('hidden');
   if (e.target === docsModalEl) docsModalEl.classList.add('hidden');
 });
 
-// Initial boot
 resetCalculator();
 renderBugsCatalog();

@@ -84,7 +84,7 @@
         <div class="keypad-grid">
           <!-- Row 1 -->
           <button id="btnAC" class="key-btn key-special" data-action="clear-all">AC</button>
-          <button id="btnC" class="key-btn key-special" data-action="clear-entry">C</button>
+          <button id="btnC" class="key-btn key-special" data-action="clear-entry" title="Clear All Data & Memory">C</button>
           <button id="btnBackspace" class="key-btn key-special" data-action="backspace" title="Xóa ký tự cuối">⌫</button>
           <button id="btnDivide" class="key-btn key-op" data-action="operator" data-val="÷">÷</button>
 
@@ -162,19 +162,20 @@
     <div class="qa-drawer-content">
       <div class="qa-drawer-header">
         <div>
-          <h2>🕵️‍♂️ QA Inspector - Danh Sách 15 Lỗi Cài Cắm (Bugs Catalog)</h2>
-          <p>Dành cho Giảng viên / Nhóm trưởng QA để kiểm tra và đối chiếu kết quả kiểm thử.</p>
+          <h2>🕵️‍♂️ QA Inspector - Danh Mục 16 Lỗi Cài Cắm (Chuẩn 5 Nhóm CSE3066)</h2>
+          <p>Bao gồm: 10 lỗi trong đặc tả (SRS) + 6 lỗi ngoài đặc tả (Functional, Visual, Content, Performance, Crash).</p>
         </div>
         <button id="btnCloseQA" class="btn-close">&times;</button>
       </div>
 
       <div class="qa-filter-bar">
-        <span class="filter-label">Bộ lọc mức độ:</span>
-        <button class="filter-btn active" data-filter="all">Tất cả (15)</button>
-        <button class="filter-btn" data-filter="Critical">Critical</button>
-        <button class="filter-btn" data-filter="Major">Major</button>
-        <button class="filter-btn" data-filter="Medium">Medium</button>
-        <button class="filter-btn" data-filter="Minor">Minor</button>
+        <span class="filter-label">Bộ lọc:</span>
+        <button class="filter-btn active" data-filter="all">Tất cả (16)</button>
+        <button class="filter-btn" data-filter="Functional">Functional (5)</button>
+        <button class="filter-btn" data-filter="Visual">Visual (3)</button>
+        <button class="filter-btn" data-filter="Content">Content (3)</button>
+        <button class="filter-btn" data-filter="Performance">Performance (2)</button>
+        <button class="filter-btn" data-filter="Crash">Crash (3)</button>
       </div>
 
       <div class="qa-bugs-grid" id="bugsListContainer">
