@@ -190,3 +190,4 @@ for b in bugs:
     print(f"Generated: {out_file}")
 
 print("All 16 bug evidence images generated successfully!")
+

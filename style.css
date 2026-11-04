@@ -304,7 +304,8 @@ body {
 .screen-main {
   text-align: right;
   margin-top: 0.5rem;
-  overflow: visible; /* Intentionally visible for digit overflow testing */
+  overflow: visible; /* Intentionally visible for SEED-06 digit overflow */
+  position: relative;
 }
 
 .screen-value {
@@ -314,7 +315,7 @@ body {
   color: var(--screen-text);
   letter-spacing: -0.03em;
   line-height: 1.1;
-  word-break: break-all;
+  white-space: nowrap; /* SEED-06: Do not wrap, spill horizontally past border */
   transition: color 0.15s ease;
 }
 
@@ -497,6 +498,7 @@ body {
   padding: 0.75rem 1rem;
   cursor: pointer;
   transition: all 0.2s ease;
+  overflow: visible; /* SEED-08: allow visual overflow */
 }
 
 .history-item:hover {
@@ -507,9 +509,11 @@ body {
 
 .history-expr {
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: #94a3b8;
   margin-bottom: 0.25rem;
+  white-space: nowrap; /* SEED-08: long expression will not wrap, breaking card layout */
+  overflow: visible;
 }
 
 .history-res {
@@ -758,14 +762,21 @@ body {
   color: #38bdf8;
 }
 
+.bug-card-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 0.4rem;
+}
+
 .btn-trigger-bug {
-  align-self: flex-start;
-  background: rgba(99, 102, 241, 0.2);
+  background: rgba(99, 102, 241, 0.25);
   color: #c7d2fe;
-  border: 1px solid rgba(99, 102, 241, 0.4);
-  padding: 0.35rem 0.8rem;
+  border: 1px solid rgba(99, 102, 241, 0.45);
+  padding: 0.4rem 0.85rem;
   border-radius: var(--radius-sm);
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
@@ -776,6 +787,91 @@ body {
 
 .btn-trigger-bug:hover {
   background: var(--primary);
+  color: white;
+}
+
+.btn-evidence-link {
+  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn-evidence-link:hover {
+  background: #059669;
+  color: white;
+  border-color: #059669;
+}
+
+/* On-Screen Bug Alert Toast */
+.qa-bug-toast {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
+  color: #f8fafc;
+  padding: 0.85rem 1.4rem;
+  border-radius: 12px;
+  border: 1px solid #6366f1;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(99, 102, 241, 0.4);
+  font-family: var(--font-main, sans-serif);
+  font-size: 0.92rem;
+  font-weight: 600;
+  z-index: 10000;
+  max-width: 90vw;
+  width: 580px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.qa-bug-toast.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.qa-bug-toast-badge {
+  background: #ef4444;
+  color: white;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.qa-bug-toast-msg {
+  flex: 1;
+  line-height: 1.4;
+  color: #e2e8f0;
+}
+
+.qa-bug-toast-close {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0 0.3rem;
+  transition: color 0.15s;
+}
+
+.qa-bug-toast-close:hover {
   color: white;
 }
 

@@ -17,6 +17,13 @@
     <div class="glow-orb orb-3"></div>
   </div>
 
+  <!-- Realtime Bug Detection Toast -->
+  <div id="qaBugToast" class="qa-bug-toast">
+    <span id="qaBugBadge" class="qa-bug-toast-badge">SEED-XX</span>
+    <span id="qaBugMsg" class="qa-bug-toast-msg">Thông báo phát hiện lỗi</span>
+    <button id="btnToastClose" class="qa-bug-toast-close" title="Đóng">&times;</button>
+  </div>
+
   <header class="app-header">
     <div class="header-brand">
       <div class="brand-logo">
@@ -34,6 +41,22 @@
     </div>
 
     <div class="header-actions">
+      <a href="https://github.com/QUANGPV021/calculator-qa-testing" target="_blank" class="btn-action" title="Mở kho mã nguồn GitHub">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+        </svg>
+        <span>GitHub</span>
+      </a>
+
+      <a href="NOP_2_FILE_DRIVE/BUG_MANIFEST_CSE3066_23110342.xlsx" class="btn-action" download="BUG_MANIFEST_CSE3066_23110342.xlsx" title="Tải file Excel danh mục 16 lỗi cài sẵn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        <span>File Bug (.xlsx)</span>
+      </a>
+
       <button id="btnDocsModal" class="btn-action" title="Xem tài liệu kiểm thử">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -47,7 +70,7 @@
 
       <button id="btnToggleQAMode" class="btn-action btn-qa-badge" title="Mở Bảng Giảng Viên / QA Inspector">
         <span class="status-dot"></span>
-        <span>QA Inspector (Đáp án)</span>
+        <span>QA Inspector (16 Bugs)</span>
       </button>
     </div>
   </header>

@@ -36,7 +36,12 @@ ws_bug["G2"] = "Hệ thống: SmartCalc Pro (Web Application & Testing)"
 ws_bug["G2"].font = Font(name="Calibri", size=11, bold=True)
 
 ws_bug["A3"] = "GitHub Repo: https://github.com/QUANGPV021/calculator-qa-testing"
+ws_bug["A3"].hyperlink = "https://github.com/QUANGPV021/calculator-qa-testing"
+ws_bug["A3"].font = Font(name="Calibri", size=10, color="0563C1", underline="single")
+
 ws_bug["G3"] = "Website Live: https://quangpv021.github.io/calculator-qa-testing/"
+ws_bug["G3"].hyperlink = "https://quangpv021.github.io/calculator-qa-testing/"
+ws_bug["G3"].font = Font(name="Calibri", size=10, color="0563C1", underline="single")
 
 headers_manifest = [
     "Mã lỗi", "Loại lỗi", "Mức nghiêm trọng", "Chức năng / Luồng",
@@ -111,6 +116,10 @@ for row in ws_bug.iter_rows(min_row=5, max_row=len(manifest_data)+5, min_col=1, 
                 elif cell.value == "Major":
                     cell.fill = PatternFill(start_color="FFF2CC", fill_type="solid")
                     cell.font = Font(name="Calibri", size=10, bold=True, color="B25900")
+            elif cell.column == 11:
+                if str(cell.value).startswith("http"):
+                    cell.hyperlink = str(cell.value)
+                    cell.font = Font(name="Calibri", size=10, color="0563C1", underline="single")
 
 col_widths = [12, 14, 16, 22, 24, 26, 35, 30, 30, 30, 32, 28, 16]
 for idx, w in enumerate(col_widths, start=1):
