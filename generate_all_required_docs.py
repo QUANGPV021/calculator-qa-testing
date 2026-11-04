@@ -369,3 +369,4 @@ doc_bb.add_paragraph(
 )
 doc_bb.save(os.path.join(output_dir, "Mau_06_Bien_ban_ban_giao.docx"))
 print("All updated and complete files generated successfully!")
+
