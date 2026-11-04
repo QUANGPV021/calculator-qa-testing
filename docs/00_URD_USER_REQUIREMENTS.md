@@ -61,3 +61,4 @@ Hệ thống phục vụ người dùng cá nhân (học sinh, sinh viên, kế 
 | **US-04** | Là một **Người dùng**, tôi muốn xem lại danh sách các phép tính đã làm để kiểm tra sai sót. | **Medium** | - Tự động ghi nhận biểu thức và kết quả vào panel bên phải.<br>- Nhấp chuột nạp lại số vào màn hình. | `FR-17, FR-18, FR-19` |
 | **US-05** | Là một **Người dùng**, tôi muốn hệ thống báo lỗi rõ ràng khi chia cho 0 hoặc căn số âm để không hiểu nhầm kết quả. | **High** | - Không hiển thị chuỗi `Infinity` hay `NaN`.<br>- Đưa ra thông báo lỗi thân thiện (`Cannot divide by 0`, `Invalid Input`). | `FR-09, FR-11` |
 | **US-06** | Là một **Chuyên viên QA**, tôi muốn có bảng kiểm tra lỗi trực quan để đối chiếu kết quả kiểm thử phần mềm. | **Low** | - Có bảng QA Inspector phân loại theo 5 nhóm.<br>- Hỗ trợ nút tự động mô phỏng phím bấm tái hiện lỗi. | `FR-20` |
+

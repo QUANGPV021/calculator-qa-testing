@@ -238,8 +238,11 @@ const BUGS_CATALOG = [
     repro: () => {
       resetCalculator();
       inputDigit('5');
-      calcSquare(true); // kích hoạt lag
       updateDisplay();
+      setTimeout(() => {
+        calcSquare(true);
+        updateDisplay();
+      }, 150);
     }
   },
   {
@@ -255,9 +258,17 @@ const BUGS_CATALOG = [
     actual: "Phép tính cũ 1+1=2 bị giữ lại trong RAM và hiện trở lại",
     file: "app.js (clearHistory)",
     repro: () => {
+      resetCalculator();
       runSequence(['1', '+', '1', '=']);
-      clearHistory();
-      setTimeout(() => runSequence(['2', '+', '2', '=']), 300);
+      setTimeout(() => {
+        clearHistory();
+        setTimeout(() => {
+          runSequence(['2', '+', '2', '=']);
+          setTimeout(() => {
+            showPerformanceWarning("⚠️ [LỖI HIỆU NĂNG SEED-13]\nPhép tính cũ '1 + 1 = 2' đã bị phục hồi trở lại do bộ nhớ RAM (mảng historyData) không được giải phóng khi nhấn Xóa lịch sử!");
+          }, 800);
+        }, 500);
+      }, 800);
     }
   },
 
@@ -533,6 +544,7 @@ function calcSquareRoot() {
 }
 
 function calcSquare(triggerLag = true) {
+  let elapsed = 0;
   // Performance Bug SEED-12: CPU Heavy Loop > 3.5s
   if (triggerLag) {
     const startTime = performance.now();
@@ -541,13 +553,19 @@ function calcSquare(triggerLag = true) {
     for (let i = 0; i < 400000000; i++) {
       counter += (i % 2);
     }
-    const elapsed = Math.round(performance.now() - startTime);
+    elapsed = Math.round(performance.now() - startTime);
     console.warn(`[PERFORMANCE BUG SEED-12] Thao tác bị nghẽn trong: ${elapsed}ms`);
   }
 
   const val = parseFloat(state.currentInput);
   state.currentInput = `${val * val}`;
   state.waitingForSecondOperand = true;
+
+  if (triggerLag && elapsed > 100) {
+    setTimeout(() => {
+      showPerformanceWarning(`⚠️ [LỖI HIỆU NĂNG SEED-12]\nPhép tính bình phương x² bị nghẽn Main Thread mất: ${elapsed} ms!\n(Vi phạm yêu cầu NFR-01: thời gian phản hồi phải < 50ms)`);
+    }, 20);
+  }
 }
 
 function calcPercent() {
@@ -634,6 +652,41 @@ function clearHistory() {
     </div>
   `;
   // state.historyData = []; // Bị comment out cố ý gây rò rỉ RAM
+}
+
+// Performance Notification
+function showPerformanceWarning(msg) {
+  let toast = document.getElementById('perfToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'perfToast';
+    toast.style.position = 'fixed';
+    toast.style.top = '20px';
+    toast.style.left = '50%';
+    toast.style.transform = 'translateX(-50%)';
+    toast.style.background = 'linear-gradient(135deg, #b45309 0%, #78350f 100%)';
+    toast.style.color = '#fef3c7';
+    toast.style.padding = '1rem 1.5rem';
+    toast.style.borderRadius = '12px';
+    toast.style.boxShadow = '0 10px 25px rgba(0,0,0,0.5), 0 0 15px rgba(245, 158, 11, 0.4)';
+    toast.style.border = '1px solid #f59e0b';
+    toast.style.fontFamily = 'var(--font-main, sans-serif)';
+    toast.style.fontSize = '0.95rem';
+    toast.style.fontWeight = '600';
+    toast.style.zIndex = '9999';
+    toast.style.whiteSpace = 'pre-line';
+    toast.style.textAlign = 'center';
+    toast.style.transition = 'all 0.3s ease';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.style.display = 'block';
+  toast.style.opacity = '1';
+  clearTimeout(toast.timeoutId);
+  toast.timeoutId = setTimeout(() => {
+    toast.style.opacity = '0';
+    setTimeout(() => { toast.style.display = 'none'; }, 300);
+  }, 4500);
 }
 
 // Crash Simulator

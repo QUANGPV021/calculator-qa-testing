@@ -26,3 +26,4 @@
 ## 3. KẾT LUẬN CỦA TESTER
 - Tài liệu SRS đã được Chủ hệ thống tiếp thu và bổ sung đầy đủ các chỉ số định lượng cụ thể.
 - Tester thông qua tài liệu đặc tả sau khi các đề xuất trên đã được cập nhật hoàn chỉnh.
+
